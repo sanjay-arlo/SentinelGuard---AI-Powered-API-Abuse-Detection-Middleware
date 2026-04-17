@@ -37,7 +37,7 @@ Internet -> NGINX (Port 80/443) -> SentinelGuard (Port 8000) -> Backend API (Por
 
 1. **Clone and setup**:
    ```bash
-   git clone https://github.com/your-username/sentinelguard.git
+   git clone https://github.com/sanjay-arlo/SentinelGuard---AI-Powered-API-Abuse-Detection-Middleware.git
    cd "SentinelGuard - AI-Powered API Abuse Detection Middleware"
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\scripts\activate
