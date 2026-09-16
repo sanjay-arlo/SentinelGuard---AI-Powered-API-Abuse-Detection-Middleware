@@ -1,186 +1,90 @@
-# SentinelGuard - AI-Powered API Abuse Detection Middleware
+# SentinelGuard - API Abuse Detection Middleware
 
-A production-grade FastAPI middleware that sits between NGINX and backend services, performing intelligent rate limiting and behavioral abuse detection using sliding window algorithms, risk scoring, and pattern analysis.
+A **production-oriented prototype** of FastAPI middleware that sits between NGINX and backend services and demonstrates behavioral rate limiting, abuse detection and risk scoring.
+
+## Scope
+
+SentinelGuard is a portfolio engineering project. It is designed to demonstrate architecture, security patterns, asynchronous processing and detection logic; it has not been represented as a deployed production security service.
 
 ## Overview
 
-SentinelGuard solves the limitations of traditional rate limiters by analyzing **behavior**, not just volume. It protects against sophisticated attacks including:
-- Slow-drip bots (staying under rate limits)
-- Credential stuffing (distributed IPs)
+The middleware analyzes request behaviour rather than relying only on request volume. The prototype covers:
+- Slow-drip bot patterns
+- Credential-stuffing-style activity
 - Sequential ID probing
 - Regular-interval automation
 
 ## Architecture
 
-```
+```text
 Internet -> NGINX (Port 80/443) -> SentinelGuard (Port 8000) -> Backend API (Port 8001)
 ```
 
 ## Key Features
 
-- **Behavioral Scoring**: Risk analysis beyond simple request counting
-- **Fingerprint Tracking**: IP + User-Agent + headers for accurate identification
-- **Pattern Detection**: Regular intervals, sequential access, failed authentication bursts
-- **Adaptive Thresholds**: Per-endpoint rate limiting configurations
-- **Auto-Recovery**: Cooldown periods with automatic unblocking
-- **Real-time Monitoring**: Live threat feeds and statistics
+- Behavioral risk scoring
+- Request fingerprint tracking
+- Pattern detection
+- Per-endpoint thresholds
+- Automatic cooldown/unblocking
+- Monitoring endpoints
 
 ## Tech Stack
 
-- **Backend**: Python 3.11+, FastAPI, Uvicorn
-- **Database**: PostgreSQL 15+ with SQLAlchemy 2.0
-- **Cache**: Redis 7.0+ for sliding windows and real-time data
-- **Background Jobs**: Celery for async logging and cleanup
-- **Infrastructure**: Docker, Docker Compose, NGINX
+- Python 3.11+
+- FastAPI / Uvicorn
+- PostgreSQL 15+
+- Redis 7+
+- Celery
+- SQLAlchemy 2.0
+- Docker / Docker Compose
+- NGINX
 
 ## Quick Start
 
-1. **Clone and setup**:
+1. Clone the repository:
    ```bash
    git clone https://github.com/sanjay-arlo/SentinelGuard---AI-Powered-API-Abuse-Detection-Middleware.git
-   cd "SentinelGuard - AI-Powered API Abuse Detection Middleware"
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\scripts\activate
+   cd SentinelGuard---AI-Powered-API-Abuse-Detection-Middleware
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
    pip install -r requirements.txt
    ```
-
-2. **Configure environment**:
+3. Copy the environment template and set local values:
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
    ```
-
-3. **Start with Docker**:
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Run migrations**:
+4. Start the local dependencies with Docker Compose.
+5. Run database migrations:
    ```bash
    alembic upgrade head
    ```
-
-5. **Access the service**:
-   - API: http://localhost:8000
-   - Admin API: http://localhost:8000/api/v1/admin
-   - Monitoring: http://localhost:8000/api/v1/monitor
-   - Health: http://localhost:8000/health
+6. Start the application using the repository's documented run command.
 
 ## Configuration
 
-Key environment variables:
-
-```env
-# Rate limiting defaults
-DEFAULT_RATE_LIMIT=100
-DEFAULT_WINDOW_SECONDS=60
-DEFAULT_SCORE_THRESHOLD=50
-
-# Database
-DB_HOST=postgres
-DB_NAME=sentinelguard
-DB_USER=sentinel
-DB_PASSWORD=your-password
-
-# Redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-
-# Security
-SECRET_KEY=your-secret-key
-ADMIN_API_KEY=your-admin-api-key
-```
+Never commit real secrets. Use environment variables for database passwords, API keys and signing secrets.
 
 ## API Documentation
 
-### Admin Endpoints
-- `POST /api/v1/admin/blacklist` - Add IP to blacklist
-- `DELETE /api/v1/admin/blacklist/{ip}` - Remove IP from blacklist
-- `POST /api/v1/admin/whitelist` - Add IP to whitelist
-- `GET /api/v1/admin/configs` - Get endpoint configurations
+The application exposes health, monitoring and administrative endpoints documented in the FastAPI OpenAPI interface when the local server is running.
 
-### Monitoring Endpoints
-- `GET /api/v1/monitor/threats` - Live threat feed
-- `GET /api/v1/monitor/stats` - Usage statistics
-- `GET /api/v1/monitor/ip/{ip}` - IP-specific analysis
+## Testing and Code Quality
 
-### Health Endpoints
-- `GET /health` - Basic health check
-- `GET /health/ready` - Readiness probe
-- `GET /health/metrics` - Prometheus metrics
-
-## Development
-
-### Running Tests
 ```bash
 pytest
-pytest tests/unit/          # Unit tests only
-pytest tests/integration/   # Integration tests only
-pytest tests/e2e/           # End-to-end tests only
+black app/
+ruff check app/
+mypy app/
 ```
 
-### Code Quality
-```bash
-black app/                  # Format code
-ruff check app/             # Lint code
-mypy app/                   # Type checking
-```
+## Deployment Notes
 
-### Database Migrations
-```bash
-alembic revision --autogenerate -m "Description"
-alembic upgrade head
-alembic downgrade -1
-```
-
-## Monitoring
-
-SentinelGuard provides comprehensive monitoring capabilities:
-
-- **Real-time threat detection** with risk scoring
-- **Request pattern analysis** for bot detection
-- **IP reputation tracking** with blacklist/whitelist
-- **Performance metrics** and response times
-- **Prometheus metrics** for integration with monitoring systems
-
-## Security Features
-
-- **Sliding window rate limiting** prevents burst attacks
-- **Behavioral analysis** detects sophisticated bots
-- **Fingerprinting** tracks users across IP changes
-- **Automatic blocking** with configurable cooldowns
-- **Admin authentication** with API key protection
-
-## Deployment
-
-### Production Deployment
-1. Set up PostgreSQL and Redis clusters
-2. Configure environment variables
-3. Deploy with Docker Compose or Kubernetes
-4. Set up NGINX reverse proxy
-5. Configure monitoring and alerting
-
-### Docker Compose Production
-```bash
-cd docker
-docker-compose up -d
-```
+Docker/Kubernetes deployment is included as an architectural option for experimentation. A real production deployment would additionally require security review, load testing, secret management, observability validation, failure-mode testing and operational runbooks.
 
 ## License
 
-MIT License - see LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the documentation in `/docs`
-- Review the API reference at `/api/v1/docs`
+MIT License - see LICENSE.
